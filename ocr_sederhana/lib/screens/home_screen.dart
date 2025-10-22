@@ -12,7 +12,7 @@ class HomeScreen extends StatelessWidget {
       ),
       body: Center(
         child: ListTile(
-          leading: const Icon(Icons.camera_alt, color: Colors.blue),
+                leading: const Icon(Icons.camera_alt, color: Colors.blue),
                 title: const Text('Mulai Pindai Teks Baru'),
                 onTap: () {
                   Navigator.push(
