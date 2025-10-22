@@ -1,8 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
-class ResultScreen extends StatelessWidget {
+class ResultScreen extends StatefulWidget {
   final String imagePath;
   final String recognizedText;
 
@@ -11,6 +12,60 @@ class ResultScreen extends StatelessWidget {
     required this.imagePath,
     required this.recognizedText,
   });
+
+  @override
+  _ResultScreenState createState() => _ResultScreenState();
+}
+class _ResultScreenState extends State<ResultScreen> {
+  late FlutterTts flutterTts;
+
+  @override
+  void initState() {
+    super.initState();
+    flutterTts = FlutterTts();
+    _initTts();
+  }
+
+ Future<void> _initTts() async {
+    try {
+      await flutterTts.setLanguage("id-ID");
+      await flutterTts.setSpeechRate(0.5);
+      await flutterTts.setVolume(1.0);
+      await flutterTts.setPitch(1.0);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error inisialisasi TTS: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _speak() async {
+    if (widget.recognizedText.isNotEmpty) {
+      try {
+        await flutterTts.speak(widget.recognizedText);
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error membaca teks: $e')),
+          );
+        }
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Tidak ada teks untuk dibaca')),
+        );
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    flutterTts.stop(); // Stop TTS engine
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +82,7 @@ class ResultScreen extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.file(
-                File(imagePath),
+                File(widget.imagePath),
                 width: double.infinity,
                 fit: BoxFit.cover,
               ),
@@ -55,9 +110,9 @@ class ResultScreen extends StatelessWidget {
                 border: Border.all(color: Colors.grey.shade300),
               ),
               child: Text(
-                recognizedText.isEmpty
+                widget.recognizedText.isEmpty
                     ? 'Tidak ada teks yang terdeteksi'
-                    : recognizedText, // tampilkan teks apa adanya
+                    : widget.recognizedText, // tampilkan teks apa adanya
                 style: const TextStyle(fontSize: 16),
               ),
             ),
@@ -80,16 +135,27 @@ class ResultScreen extends StatelessWidget {
       ),
 
       // Tambahkan FloatingActionButton dengan ikon home
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            tooltip: 'Baca Teks',
+            onPressed: _speak,
+            child: const Icon(Icons.volume_up),
+          ),
+          const SizedBox(height: 16),
+      FloatingActionButton(
+        tooltip: 'Kembali ke Home',
         onPressed: () {
-          // Navigasi ke HomeScreen dan hapus semua halaman di atasnya
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => const HomeScreen()),
-            (Route<dynamic> route) => false,
+            (route) => false, // hapus semua halaman di atas stack
           );
         },
         child: const Icon(Icons.home),
+      ),
+      ],
       ),
     );
   }
