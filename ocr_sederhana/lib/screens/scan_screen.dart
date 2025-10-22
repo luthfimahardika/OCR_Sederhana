@@ -32,14 +32,11 @@ class _ScanScreenState extends State<ScanScreen> {
         print('No cameras available');
         return;
       }
-      
-      _controller = CameraController(
-        cameras[0],
-        ResolutionPreset.medium,
-      );
-      
+
+      _controller = CameraController(cameras[0], ResolutionPreset.medium);
+
       await _controller.initialize();
-      
+
       if (mounted) {
         setState(() {
           _isInitialized = true;
@@ -73,8 +70,9 @@ class _ScanScreenState extends State<ScanScreen> {
 
       final inputImage = InputImage.fromFilePath(imagePath);
       final textRecognizer = TextRecognizer();
-      final RecognizedText recognizedText =
-          await textRecognizer.processImage(inputImage);
+      final RecognizedText recognizedText = await textRecognizer.processImage(
+        inputImage,
+      );
 
       textRecognizer.close();
 
@@ -124,14 +122,10 @@ class _ScanScreenState extends State<ScanScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Scan Document'),
-      ),
+      appBar: AppBar(title: const Text('Scan Document')),
       body: Column(
         children: [
-          Expanded(
-            child: CameraPreview(_controller),
-          ),
+          Expanded(child: CameraPreview(_controller)),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton.icon(
@@ -139,7 +133,10 @@ class _ScanScreenState extends State<ScanScreen> {
               icon: const Icon(Icons.camera),
               label: const Text('Ambil Foto & Scan'),
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
               ),
             ),
           ),
