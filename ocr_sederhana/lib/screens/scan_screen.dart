@@ -90,10 +90,13 @@ class _ScanScreenState extends State<ScanScreen> {
         );
       }
     } catch (e) {
-      print('Error taking picture: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
+          const SnackBar(
+            content: Text(
+              "Pemindaian Gagal! Periksa Izin Kamera atau coba lagi.",
+            ),
+          ),
         );
       }
     }
@@ -103,11 +106,19 @@ class _ScanScreenState extends State<ScanScreen> {
   Widget build(BuildContext context) {
     if (!_isInitialized) {
       return Scaffold(
-        appBar: AppBar(
-          title: const Text('Scan Document'),
-        ),
+        backgroundColor: Colors.grey[900],
         body: const Center(
-          child: CircularProgressIndicator(),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(color: Colors.yellow),
+              SizedBox(height: 16),
+              Text(
+                'Memuat Kamera... Harap tunggu.',
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ),
+            ],
+          ),
         ),
       );
     }
